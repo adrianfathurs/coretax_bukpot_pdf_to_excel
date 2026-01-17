@@ -1,8 +1,11 @@
 import * as pdfjsLib from 'pdfjs-dist'
 import jszip from 'jszip'
 
-// Set worker ke local file di public folder
-pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs'
+// Set worker menggunakan import dinamik dari node_modules
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.mjs',
+  import.meta.url
+).toString()
 
 /**
  * Parse data dari teks PDF menggunakan regex patterns
