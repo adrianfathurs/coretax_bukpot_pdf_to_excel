@@ -4,6 +4,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/coretax_bukpot_pdf_to_excel/',
   plugins: [
     react(),
     VitePWA({
