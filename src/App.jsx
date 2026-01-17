@@ -140,7 +140,7 @@ function App() {
         )}
 
         {status === 'idle' && (
-          <UploadZone onFileUpload={handleFileUpload} mode={mode} />
+          <UploadZone onFileUpload={handleFileUpload} onBack={handleReset} mode={mode} />
         )}
 
         {status === 'processing' && (

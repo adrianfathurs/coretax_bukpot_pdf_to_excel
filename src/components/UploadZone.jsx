@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-function UploadZone({ onFileUpload, mode }) {
+function UploadZone({ onFileUpload, onBack, mode }) {
   const [isDragging, setIsDragging] = useState(false)
 
   const handleDragOver = (e) => {
@@ -53,6 +53,14 @@ function UploadZone({ onFileUpload, mode }) {
 
   return (
     <div className="upload-zone">
+      <button className="back-button" onClick={onBack}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Kembali
+      </button>
+
       <div
         className={`upload-area ${isDragging ? 'dragging' : ''}`}
         onDragOver={handleDragOver}

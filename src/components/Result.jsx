@@ -89,9 +89,14 @@ function Result({ results, onReset, mode }) {
           )}
         </div>
 
-        <button className="reset-button" onClick={onReset}>
-          Proses File Lain
-        </button>
+        <div className="result-buttons">
+          <button className="back-button-secondary" onClick={onReset}>
+            Kembali ke Beranda
+          </button>
+          <button className="reset-button" onClick={onReset}>
+            Proses File Lain
+          </button>
+        </div>
       </div>
     </div>
   )
