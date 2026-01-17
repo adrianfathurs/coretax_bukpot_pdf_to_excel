@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-function UploadZone({ onFileUpload }) {
+function UploadZone({ onFileUpload, mode }) {
   const [isDragging, setIsDragging] = useState(false)
 
   const handleDragOver = (e) => {
@@ -39,6 +39,18 @@ function UploadZone({ onFileUpload }) {
     onFileUpload(file)
   }
 
+  const getTitle = () => {
+    return mode === 'unifikasi'
+      ? 'Upload File ZIP Bukti Potong Unifikasi'
+      : 'Upload File ZIP Bukti Potong PPh 21'
+  }
+
+  const getDescription = () => {
+    return mode === 'unifikasi'
+      ? 'PDF Bukti Potong Unifikasi (BPU)'
+      : 'PDF Bukti Potong PPh 21 (BP21)'
+  }
+
   return (
     <div className="upload-zone">
       <div
@@ -55,7 +67,7 @@ function UploadZone({ onFileUpload }) {
           </svg>
         </div>
 
-        <h2>Upload File ZIP Bukti Potong</h2>
+        <h2>{getTitle()}</h2>
 
         <p>Drag & drop file ZIP di sini, atau</p>
 
@@ -71,7 +83,7 @@ function UploadZone({ onFileUpload }) {
 
         <div className="upload-info">
           <p className="info-item">📁 Format: .ZIP</p>
-          <p className="info-item">📄 Isi: Kumpulan PDF Bukti Potong</p>
+          <p className="info-item">📄 Isi: Kumpulan {getDescription()}</p>
           <p className="info-item">⚡ Proses: Cepat & Otomatis</p>
         </div>
       </div>

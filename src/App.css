@@ -161,6 +161,130 @@ body {
   width: 100%;
 }
 
+/* Mode Selection */
+.mode-selection {
+  width: 100%;
+  max-width: 900px;
+}
+
+.selection-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.selection-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  animation: float 3s ease-in-out infinite;
+}
+
+.selection-header h2 {
+  font-size: 2rem;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.selection-header p {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.mode-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.mode-card {
+  background: var(--bg-secondary);
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  box-shadow: var(--shadow-lg);
+  border: 2px solid var(--border-light);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.mode-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--accent-gradient);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.mode-card:hover::before,
+.mode-card.hovered::before {
+  opacity: 1;
+}
+
+.mode-card:hover,
+.mode-card.hovered {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--accent-primary);
+}
+
+.mode-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.mode-card h3 {
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.mode-card p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.mode-arrow {
+  position: absolute;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  font-size: 1.5rem;
+  color: var(--accent-primary);
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.3s ease;
+}
+
+.mode-card:hover .mode-arrow,
+.mode-card.hovered .mode-arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.selection-info {
+  text-align: center;
+  padding: 1.5rem;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+}
+
+.selection-info p {
+  color: var(--text-tertiary);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
 /* Upload Zone */
 .upload-zone {
   width: 100%;
@@ -726,6 +850,15 @@ body {
   .upload-info {
     grid-template-columns: 1fr;
     gap: 0.75rem;
+  }
+
+  .mode-cards {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .mode-card {
+    padding: 2rem 1.5rem;
   }
 }
 

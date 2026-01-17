@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react'
 import './App.css'
+import ModeSelection from './components/ModeSelection'
 import UploadZone from './components/UploadZone'
 import Processing from './components/Processing'
 import Result from './components/Result'
 import Error from './components/Error'
 import { parsePDFsFromZip } from './utils/pdfParser'
 import { generateExcel } from './utils/excelGenerator'
+import { parsePDFsFromZip as parsePDFsFromZipUnifikasi } from './utils/pdfParserUnifikasi'
+import { generateExcel as generateExcelUnifikasi } from './utils/excelGeneratorUnifikasi'
 
 function App() {
   const [darkMode, setDarkMode] = useState(() => {
@@ -15,7 +18,8 @@ function App() {
     return window.matchMedia('(prefers-color-scheme: dark)').matches
   })
 
-  const [status, setStatus] = useState('idle')
+  const [mode, setMode] = useState(null) // 'pph21' or 'unifikasi'
+  const [status, setStatus] = useState('selection') // 'selection', 'idle', 'processing', 'complete', 'error'
   const [progress, setProgress] = useState({ percentage: 0, message: '', current: 0, total: 0 })
   const [results, setResults] = useState(null)
   const [error, setError] = useState(null)
@@ -35,13 +39,20 @@ function App() {
     setDarkMode(!darkMode)
   }
 
+  const handleModeSelect = (selectedMode) => {
+    setMode(selectedMode)
+    setStatus('idle')
+  }
+
   const handleFileUpload = async (file) => {
     setStatus('processing')
     setProgress({ percentage: 0, message: 'Memuat file ZIP...', current: 0, total: 0 })
 
     try {
-      // Parse PDFs
-      const parseResults = await parsePDFsFromZip(file, setProgress)
+      // Pilih parser berdasarkan mode
+      const parseResults = mode === 'unifikasi'
+        ? await parsePDFsFromZipUnifikasi(file, setProgress)
+        : await parsePDFsFromZip(file, setProgress)
 
       if (parseResults.length === 0) {
         throw new Error('Tidak ada file PDF ditemukan dalam arsip ZIP')
@@ -49,13 +60,19 @@ function App() {
 
       // Generate Excel
       setProgress(prev => ({ ...prev, percentage: 95, message: 'Membuat file Excel...' }))
-      const blob = await generateExcel(parseResults)
+      const blob = mode === 'unifikasi'
+        ? await generateExcelUnifikasi(parseResults)
+        : await generateExcel(parseResults)
 
-      // Auto download
+      // Auto download dengan nama file berbeda berdasarkan mode
+      const fileName = mode === 'unifikasi'
+        ? 'BuktiPotong_Unifikasi_Rekap.xlsx'
+        : 'BuktiPotong_PPh21_Rekap.xlsx'
+
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = 'BuktiPotong_Rekap.xlsx'
+      a.download = fileName
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
@@ -73,7 +90,8 @@ function App() {
   }
 
   const handleReset = () => {
-    setStatus('idle')
+    setStatus('selection')
+    setMode(null)
     setProgress({ percentage: 0, message: '', current: 0, total: 0 })
     setResults(null)
     setError(null)
@@ -117,8 +135,12 @@ function App() {
       </header>
 
       <main className="App-main">
+        {status === 'selection' && (
+          <ModeSelection onSelectMode={handleModeSelect} />
+        )}
+
         {status === 'idle' && (
-          <UploadZone onFileUpload={handleFileUpload} />
+          <UploadZone onFileUpload={handleFileUpload} mode={mode} />
         )}
 
         {status === 'processing' && (
@@ -126,7 +148,7 @@ function App() {
         )}
 
         {status === 'complete' && (
-          <Result results={results} onReset={handleReset} />
+          <Result results={results} onReset={handleReset} mode={mode} />
         )}
 
         {status === 'error' && (

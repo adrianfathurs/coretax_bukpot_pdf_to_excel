@@ -1,17 +1,38 @@
-function Result({ results, onReset }) {
-  const successful = results.filter(r => r.success).length
-  const failed = results.filter(r => !r.success).length
+function Result({ results, onReset, mode }) {
+  const successful = results.length
+  const fileName = mode === 'unifikasi'
+    ? 'BuktiPotong_Unifikasi_Rekap.xlsx'
+    : 'BuktiPotong_PPh21_Rekap.xlsx'
 
-  const totalBruto = results
-    .filter(r => r.success)
-    .reduce((sum, r) => sum + (r.data?.penghasilan_bruto || 0), 0)
+  // Hitung totals berdasarkan mode
+  let totalBruto = 0
+  let totalDPP = 0
+  let totalPPh = 0
 
-  const totalPPh = results
-    .filter(r => r.success)
-    .reduce((sum, r) => sum + (r.data?.pph_dipotong || 0), 0)
+  if (mode === 'unifikasi') {
+    // Untuk Unifikasi, hitung DPP dan PPh
+    totalDPP = results
+      .reduce((sum, r) => sum + (r.dpp || 0), 0)
+
+    totalPPh = results
+      .reduce((sum, r) => sum + (r.pph || 0), 0)
+  } else {
+    // Untuk PPh21, hitung Bruto dan PPh dari r.data
+    totalBruto = results
+      .reduce((sum, r) => sum + ((r.data?.penghasilan_bruto || r.penghasilan_bruto) || 0), 0)
+
+    totalPPh = results
+      .reduce((sum, r) => sum + ((r.data?.pph_dipotong || r.pph_dipotong) || 0), 0)
+  }
 
   const formatNumber = (num) => {
     return new Intl.NumberFormat('id-ID').format(num)
+  }
+
+  const getTitle = () => {
+    return mode === 'unifikasi'
+      ? 'Bukti Potong Unifikasi'
+      : 'Bukti Potong PPh 21'
   }
 
   return (
@@ -27,7 +48,7 @@ function Result({ results, onReset }) {
         <h2>Proses Selesai!</h2>
 
         <p className="result-message">
-          File Excel telah otomatis terunduh dengan nama <strong>BuktiPotong_Rekap.xlsx</strong>
+          File Excel telah otomatis terunduh dengan nama <strong>{fileName}</strong>
         </p>
 
         <div className="result-stats">
@@ -41,22 +62,31 @@ function Result({ results, onReset }) {
             <div className="stat-value">{successful}</div>
           </div>
 
-          {failed > 0 && (
-            <div className="stat-item error">
-              <div className="stat-label">Gagal</div>
-              <div className="stat-value">{failed}</div>
-            </div>
+          {mode === 'unifikasi' ? (
+            <>
+              <div className="stat-item money">
+                <div className="stat-label">Total DPP</div>
+                <div className="stat-value">Rp {formatNumber(totalDPP)}</div>
+              </div>
+
+              <div className="stat-item money">
+                <div className="stat-label">Total PPh</div>
+                <div className="stat-value">Rp {formatNumber(totalPPh)}</div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="stat-item money">
+                <div className="stat-label">Total Bruto</div>
+                <div className="stat-value">Rp {formatNumber(totalBruto)}</div>
+              </div>
+
+              <div className="stat-item money">
+                <div className="stat-label">Total PPh</div>
+                <div className="stat-value">Rp {formatNumber(totalPPh)}</div>
+              </div>
+            </>
           )}
-
-          <div className="stat-item money">
-            <div className="stat-label">Total Bruto</div>
-            <div className="stat-value">Rp {formatNumber(totalBruto)}</div>
-          </div>
-
-          <div className="stat-item money">
-            <div className="stat-label">Total PPh</div>
-            <div className="stat-value">Rp {formatNumber(totalPPh)}</div>
-          </div>
         </div>
 
         <button className="reset-button" onClick={onReset}>
