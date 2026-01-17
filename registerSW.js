@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/coretax_bukpot_pdf_to_excel/sw.js', { scope: '/coretax_bukpot_pdf_to_excel/' })})}
