@@ -68,7 +68,8 @@ function extractDataFromText(text) {
     // Bagian B - Table values (B.3, B.4, B.5, B.6, B.7 di header, value di bawah berurutan)
     // Struktur: "B.3 B.4 B.5 B.6 B.7 [newline] 22-100-13 Pembelian... 5.919.903.529 1.5 88.798.553"
     kode_objek_pajak: extractField(cleanText, [
-      /B\.3[^B]*?(\d{2}-\d{3}-\d{2})/i
+      /B\.3\s+B\.4\s+B\.5\s+B\.6\s+B\.7[^0-9]*?(\d{2}-\d{3}-\d{2})/i,
+      /(\d{2}-\d{3}-\d{2})/i
     ]),
     dpp: extractField(cleanText, [
       /Pembelian[\s\S]+?\s+([\d.,]+)\s+[\d.,]+\s+[\d.,]+/i
