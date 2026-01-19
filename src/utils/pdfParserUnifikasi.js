@@ -8,6 +8,17 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 ).toString()
 
 /**
+ * Mapping Kode Sistem (Kode Objek Pajak) ke Nama Legal (Nama Objek Pajak)
+ * Untuk PPh Unifikasi (Pasal 22)
+ */
+const KODE_SISTEM_MAP = {
+  '22-100-01': 'Pembelian barang oleh Bendahara Pemerintah',
+  '22-100-02': 'Pembelian barang oleh BUMN/BUMD',
+  '22-100-11': 'Impor barang melalui DJBC',
+  '22-100-13': 'Pembelian komoditas tambang dari pemegang IUP'
+}
+
+/**
  * Parse data dari teks PDF PPh Unifikasi menggunakan regex patterns
  */
 function extractDataFromText(text) {
@@ -59,9 +70,6 @@ function extractDataFromText(text) {
     kode_objek_pajak: extractField(cleanText, [
       /B\.3[^B]*?(\d{2}-\d{3}-\d{2})/i
     ]),
-    objek_pajak: extractField(cleanText, [
-      /\d{2}-\d{3}-\d{2}\s+(Pembelian[\s\S]+?)\s+[\d.,]+\s+[\d.,]+/i
-    ]),
     dpp: extractField(cleanText, [
       /Pembelian[\s\S]+?\s+([\d.,]+)\s+[\d.,]+\s+[\d.,]+/i
     ]),
@@ -95,6 +103,13 @@ function extractDataFromText(text) {
   // Cleanup nama - remove trailing section label
   if (data.nama) {
     data.nama = data.nama.replace(/\s+A\s*\.?\d*$/, '').trim()
+  }
+
+  // Lookup nama objek pajak dari kode objek pajak menggunakan mapping
+  if (data.kode_objek_pajak) {
+    data.objek_pajak = KODE_SISTEM_MAP[data.kode_objek_pajak] || ''
+  } else {
+    data.objek_pajak = ''
   }
 
   // Cleanup DPP and PPh - remove dots (Indonesian format uses dots as thousand separators)
