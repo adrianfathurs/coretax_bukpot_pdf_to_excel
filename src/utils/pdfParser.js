@@ -8,6 +8,38 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 ).toString()
 
 /**
+ * Mapping Kode Objek Pajak ke Nama Objek Pajak
+ */
+const KODE_OBJEK_PAJAK_MAP = {
+  '21-100-35': 'Upah Pegawai Tidak Tetap yang Dibayarkan secara Bulanan',
+  '21-100-27': 'Upah Pegawai Tidak Tetap yang Dibayarkan secara Bulanan yang Mendapat Fasilitas di Daerah Tertentu',
+  '21-100-30': 'Upah Pegawai Tidak Tetap yang Dibayarkan secara Harian, Mingguan, Satuan dan Borongan dengan Penghasilan Bruto lebih dari Rp2.500.000 Sehari',
+  '21-100-31': 'Upah Pegawai Tidak Tetap yang Dibayarkan secara Harian, Mingguan, Satuan dan Borongan dengan Penghasilan Bruto lebih dari Rp2.500.000 Sehari yang Mendapat Fasilitas di Daerah Tertentu',
+  '21-100-24': 'Upah Pegawai Tidak Tetap yang Dibayarkan secara Harian, Mingguan, Satuan dan Borongan dengan Penghasilan Bruto sampai dengan Rp2.500.000 Sehari',
+  '21-100-29': 'Upah Pegawai Tidak Tetap yang Dibayarkan secara Harian, Mingguan, Satuan dan Borongan dengan Penghasilan Bruto sampai dengan Rp2.500.000 Sehari yang Mendapat Fasilitas di Daerah Tertentu',
+  '21-100-18': 'Imbalan kepada Penasihat, Pengajar, Pelatih, Penceramah, Penyuluh, dan Moderator',
+  '21-100-19': 'Imbalan kepada Pengarang, Peneliti, Penerjemah',
+  '21-100-20': 'Imbalan kepada Pemberi Jasa dalam Segala Bidang',
+  '21-100-21': 'Imbalan kepada Agen Iklan',
+  '21-100-22': 'Imbalan kepada Pengawas atau Pengelola Proyek',
+  '21-100-23': 'Imbalan kepada Pembawa Pesanan atau yang Menemukan Langganan atau yang Menjadi Perantara',
+  '21-100-06': 'Imbalan kepada Petugas Penjaja Barang Dagangan',
+  '21-100-33': 'Imbalan kepada Pemain Musik, Pembawa Acara, Penyanyi, Pelawak, Bintang Film, Bintang Sinetron, Bintang Iklan, Sutradara, Kru Film, Foto Model, Peragawan/Peragawati, Pemain Drama, Penari, Pemahat, Pelukis, Pembuat/Pencipta Konten pada Media yang Dibagikan secara Daring (Influencer, Selebgram, Blogger, Vlogger, dan Sejenis Lainnya), dan Seniman Lainnya',
+  '21-100-34': 'Imbalan yang Diterima oleh Olahragawan',
+  '21-100-36': 'Imbalan kepada Peserta Perlombaan dalam Segala Bidang, antara lain Perlombaan Olah Raga, Seni, Ketangkasan, Ilmu Pengetahuan, Teknologi, dan Perlombaan Lainnya',
+  '21-100-14': 'Imbalan kepada Peserta Rapat, Konferensi, Sidang, Pertemuan, Kunjungan Kerja, Seminar, Lokakarya, atau Pertunjukan, atau Kegiatan Tertentu Lainnya',
+  '21-100-15': 'Imbalan kepada Peserta atau Anggota dalam Suatu Kepanitiaan sebagai Penyelenggara Kegiatan Tertentu',
+  '21-100-16': 'Imbalan kepada Peserta Pendidikan, Pelatihan, dan Magang',
+  '21-100-17': 'Imbalan kepada Peserta Kegiatan Lainnya',
+  '21-100-10': 'Honorarium atau Imbalan kepada Anggota Dewan Komisaris atau Dewan Pengawas yang Menerima Imbalan secara Tidak Teratur',
+  '21-100-07': 'Imbalan kepada Tenaga Ahli (Pengacara, Akuntan, Arsitek, Dokter, Konsultan, Notaris, Pejabat Pembuat Akte Tanah, Penilai, Aktuaris)',
+  '21-100-05': 'Imbalan kepada Agen Asuransi',
+  '21-100-12': 'Uang Manfaat Pensiun atau Penghasilan Sejenisnya yang diambil sebagian oleh Peserta Program Pensiun yang Masih Berstatus sebagai Pegawai',
+  '21-401-01': 'Uang Pesangon yang Dibayarkan Sekaligus',
+  '21-401-02': 'Uang Manfaat Pensiun, Tunjangan Hari Tua, atau Jaminan Hari Tua yang Dibayarkan Sekaligus'
+}
+
+/**
  * Parse data dari teks PDF menggunakan regex patterns
  */
 function extractDataFromText(text) {
@@ -31,6 +63,11 @@ function extractDataFromText(text) {
     nama_penerima: extractField(cleanText, [
       /A\.2\s+Nama\s+:?\s*([A-Z][A-Z\s\.]+?)(?=\s+A\.3|$)/i
     ]),
+    // Extract kode objek pajak, lalu lookup nama objek pajak dari mapping
+    kode_objek_pajak: extractField(cleanText, [
+      /KODE\s+OBJEK\s+PAJAK\s*:\s*(\d{2}-\d{3}-\d{2})/i,
+      /(\d{2}-\d{3}-\d{2})/i
+    ]),
     // Untuk tabel, cari pola spesifik di baris data
     penghasilan_bruto: extractNumber(cleanText, [
       // Pola: "Imbalan... [spasi] [angka bruto] [spasi] [DPP] [spasi] [TARIF] [spasi] [PPh]"
@@ -48,6 +85,13 @@ function extractDataFromText(text) {
       /C\.4\s+Tanggal\s+:?\s*(\d{1,2}\s+[A-Za-z]+\s+\d{4})/i,
       /Tanggal\s+:?\s*(\d{1,2}\s+[A-Za-z]+\s+\d{4})/i
     ])
+  }
+
+  // Lookup nama objek pajak dari kode objek pajak menggunakan mapping
+  if (data.kode_objek_pajak) {
+    data.nama_objek_pajak = KODE_OBJEK_PAJAK_MAP[data.kode_objek_pajak] || ''
+  } else {
+    data.nama_objek_pajak = ''
   }
 
   // Clean up values

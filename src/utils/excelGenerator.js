@@ -46,6 +46,8 @@ function prepareWorksheetData(successfulParses) {
       'Status Bukti Pemotongan',
       'NIK Penerima Penghasilan',
       'Nama Penerima Penghasilan',
+      'Kode Objek Pajak',
+      'Nama Objek Pajak',
       'Penghasilan Bruto',
       'PPh Dipotong',
       'Nama Pemotong',
@@ -64,6 +66,8 @@ function prepareWorksheetData(successfulParses) {
       item.status_bukti || '',
       item.nik || '',
       item.nama_penerima || '',
+      item.kode_objek_pajak || '',
+      item.nama_objek_pajak || '',
       item.penghasilan_bruto || 0,
       item.pph_dipotong || 0,
       item.nama_pemotong || '',
@@ -76,7 +80,7 @@ function prepareWorksheetData(successfulParses) {
   const totalPPh = successfulParses.reduce((sum, item) => sum + (item.data.pph_dipotong || 0), 0)
 
   data.push([])
-  data.push(['', '', '', '', '', 'TOTAL:', totalBruto, totalPPh, '', ''])
+  data.push(['', '', '', '', '', '', '', 'TOTAL:', totalBruto, totalPPh, '', ''])
 
   return data
 }
@@ -92,6 +96,8 @@ function setColumnWidths(worksheet) {
     { wch: 15 }, // Status Bukti Pemotongan
     { wch: 25 }, // NIK Penerima Penghasilan
     { wch: 35 }, // Nama Penerima Penghasilan
+    { wch: 15 }, // Kode Objek Pajak
+    { wch: 60 }, // Nama Objek Pajak
     { wch: 18 }, // Penghasilan Bruto
     { wch: 15 }, // PPh Dipotong
     { wch: 40 }, // Nama Pemotong
